@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CFG>
+	<Control>
+		<enable>1</enable>
+		<gps_report_time>10</gps_report_time>
+	</Control>
+	<Terminal>
+		<flag>0</flag>
+		<phone>013971078461</phone>
+		<dev_id>1078461</dev_id>
+		<dev_type>12345678901234567890</dev_type>
+	</Terminal>
+	<DevParam>
+		<PreSim>01397</PreSim>
+		<OverSpeed>120</OverSpeed>
+		<videoEnable>1</videoEnable>
+		<imgEnable>1</imgEnable>
+	</DevParam>
+	<Platform>
+		<Session>
+			<!--url>59.172.105.82</url>
+			<port>6666</port-->
+			<url>119.145.167.180</url>
+			<port>7611</port>
+		</Session>
+		<DSM>
+			<Basic>
+				<speed_thres>30</speed_thres>
+				<alarm_volume>6</alarm_volume>
+				<photo_res>1</photo_res>
+				<video_res>1</video_res>
+				<auto_snap>
+					<!--0:off 1:snap4time 2:snap4distance 3:snap4insert-->
+					<tactics>0</tactics>
+					<interval_time>3600</interval_time>
+					<interval_distance>200</interval_distance>
+					<snap_num>3</snap_num>
+					<snap_interval>2</snap_interval>
+				</auto_snap>
+			</Basic>
+			<Alarm>
+				<Fatigue level1="1" level2="1">
+					<speed_thres>50</speed_thres>
+					<rec_time>10</rec_time>
+					<snap_num>3</snap_num>
+					<snap_interval>2</snap_interval>
+					<up_video>1</up_video>
+				</Fatigue>
+				<Telephone level1="1" level2="1">
+					<speed_thres>50</speed_thres>
+					<rec_time>10</rec_time>
+					<snap_num>3</snap_num>
+					<snap_interval>2</snap_interval>
+					<up_video>1</up_video>
+				</Telephone>
+				<Smoking level1="1" level2="1">
+					<speed_thres>50</speed_thres>
+					<rec_time>10</rec_time>
+					<snap_num>3</snap_num>
+					<snap_interval>2</snap_interval>
+					<up_video>1</up_video>
+				</Smoking>
+				<Distraction level1="1" level2="1">
+					<speed_thres>50</speed_thres>
+					<rec_time>10</rec_time>
+					<snap_num>3</snap_num>
+					<snap_interval>2</snap_interval>
+					<up_video>1</up_video>
+				</Distraction>			
+				<Abnormal level1="1" level2="1">
+					<speed_thres>50</speed_thres>
+					<rec_time>10</rec_time>
+					<snap_num>3</snap_num>
+					<snap_interval>2</snap_interval>
+					<up_video>1</up_video>
+				</Abnormal>
+				<OnehandSW level1="1" level2="1">
+					<speed_thres>50</speed_thres>
+					<rec_time>10</rec_time>
+					<snap_num>3</snap_num>
+					<snap_interval>2</snap_interval>
+					<up_video>1</up_video>
+				</OnehandSW>
+				<HandsoffSW level1="1" level2="1">
+					<speed_thres>50</speed_thres>
+					<rec_time>10</rec_time>
+					<snap_num>3</snap_num>
+					<snap_interval>2</snap_interval>
+					<up_video>1</up_video>
+				</HandsoffSW>
+				<Sungclass level1="1" level2="1">
+					<speed_thres>50</speed_thres>
+					<rec_time>10</rec_time>
+					<snap_num>3</snap_num>
+					<snap_interval>2</snap_interval>
+					<up_video>1</up_video>
+				</Sungclass>
+				<Belt level1="1" level2="1">
+					<speed_thres>50</speed_thres>
+					<rec_time>10</rec_time>
+					<snap_num>3</snap_num>
+					<snap_interval>2</snap_interval>
+					<up_video>1</up_video>
+				</Belt>
+				<Driver_Identify>1</Driver_Identify>
+				<smoking_interval>180</smoking_interval>
+				<phone_interval>120</phone_interval>
+			</Alarm>
+		</DSM>
+		<ADAS>
+			<Basic>
+				<speed_thres>30</speed_thres>
+				<alarm_volume>6</alarm_volume>
+				<photo_res>1</photo_res>
+				<video_res>1</video_res>
+				<auto_snap>
+					<!--0:off 1:snap4time 2:snap4distance 3:snap4insert-->
+					<tactics>0</tactics>
+					<interval_time>3600</interval_time>
+					<interval_distance>200</interval_distance>
+					<snap_num>3</snap_num>
+					<snap_interval>2</snap_interval>
+				</auto_snap>
+			</Basic>
+			<Alarm>
+				<ldw level1="1" level2="1">
+					<speed_thres>50</speed_thres>
+					<rec_time>10</rec_time>
+					<snap_num>3</snap_num>
+					<snap_interval>2</snap_interval>
+					<up_video>1</up_video>
+				</ldw>
+				<fcw level1="1" level2="1">
+					<speed_thres>50</speed_thres>
+					<rec_time>10</rec_time>
+					<snap_num>3</snap_num>
+					<snap_interval>2</snap_interval>
+					<up_video>1</up_video>
+				</fcw>
+				<hmw level1="1" level2="1">
+					<speed_thres>50</speed_thres>
+					<rec_time>10</rec_time>
+					<snap_num>3</snap_num>
+					<snap_interval>2</snap_interval>
+					<up_video>1</up_video>
+				</hmw>
+			</Alarm>
+		</ADAS>
+	</Platform>
+</CFG>

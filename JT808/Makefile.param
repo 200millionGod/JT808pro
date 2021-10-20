@@ -1,0 +1,20 @@
+CROSS_COMPILER ?= arm-linux-androideabi
+#CROSS_COMPILER ?= arm-linux
+#CROSS_COMPILER ?= aarch64-linux-gnu
+#CROSS_COMPILER ?= arm-linux-gnueabihf
+#CXX=g++
+CXX=$(CROSS_COMPILER)-g++
+CC=$(CROSS_COMPILER)-g++
+AR=$(CROSS_COMPILER)-ar
+STRIP=$(CROSS_COMPILER)-strip
+
+CXXFLAGS = -g  
+CP = cp
+MV = mv
+MKDIR = mkdir
+
+DYNAMIC_LIB_PATH ?= /home/elvis/fakeroot
+TARGET_DIR=$(PWD)
+TARGET_INC_DIR = target/inc
+TARGET_LIB_DIR = target/lib
+TARGET_BIN_DIR = target/bin

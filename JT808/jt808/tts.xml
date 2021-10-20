@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ROOT>
+	<Key>
+		<app_id>16746859</app_id>
+		<api_key>LXySS64YmDagGCyKzcFyoqta</api_key>
+		<secret_key>rqxsE9h1HD506iGGpY9dUk7WSS4qVRCr</secret_key>
+	</Key>
+	<Cfg>
+		<spd>5</spd>
+		<pit>14</pit>
+		<vol>15</vol>
+		<per>0</per>
+	</Cfg>
+</ROOT>

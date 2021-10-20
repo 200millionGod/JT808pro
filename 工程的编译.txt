@@ -1,0 +1,40 @@
+工程的编译：
+一、编译准备
+在个人用户下，
+1.解压李强提供的ndk-toolchain.tar.gz工具链包到自定义安装路径，解压ndk包android-ndk-r14b-linux-x86_64.zip到自定义安装路径：
+tar xvf ndk-toolchain.tar.gz
+unzip android-ndk-r14b-linux-x86_64.zip
+2.在~/.bashrc设置环境变量,添加以下内容用来设置arm-linux-androideabi-g++的环境变量和引用库所在位置：
+export ANDROIDPATH=/usr/local/arm/ndk-toolchain/arm-linux-androideabi
+export SYSROOT=$ANDROIDPATH/sysroot
+export ANDROIDBIN=$ANDROIDPATH/bin
+export ANDROIDLIB=$SYSROOT/usr/lib
+export PATH=$PATH:$ANDROIDBIN
+
+source ~/.bashrc 或者重启reboot
+
+3.在工程顶层目录中找到 Makefile.param 这个文件， 可以修改交叉编译链，目前已设置好，在这个文件里添加 DYNAMIC_LIB_PATH 用来放置自己想添加的.a库，我的是/home/elvis/fakeroot，每个人可以随意设置这个路径。
+
+4.在jt808目录下找到config.mk文件，设置 BIN_CFLAGS 来决定引用的.h路径,.so路径和.a路径，设置BIN_LDFLAGS 来决定引用的.so库和.a库名字，目前已设置好，如要增加新的库请继续添加。
+
+设置 BIN_TARGET 来决定要生成的bin的名称和位置，如果工程放在ubuntu共享文件夹，生成路径设置成当前路径则可能会导致生成失败。
+
+要在 BIN_LDFLAGS 增加arm-linux-androideabi-g++引用的库的所在位置：
+-L工具链安装路径/arm-linux-androideabi/sysroot/usr/lib\
+增加-lsupc++和-lstlport_shared的引用库所在位置：
+-Lndk包解压路径/sources/cxx-stl/gnu-libstdc++/4.9/libs/armeabi\
+以上两个已添加好，每个人按照自己的实际位置进行修改
+
+二、编译
+1.进入顶层路径下的jt808lib，进行libapp.a libbasecom.a libjt808.a libsocket.a的编译
+进入工程路径下的jt808lib，输入make 或者 make -j4 ，编译成功后会将生成的.a和使用的.h拷贝到顶层目录的target/lib/中，make clean会在target/lib和当前路径下删除这些文件
+2.进入工程顶层路径的jt808目录，进行可执行程序的编译
+进入工程路径下的jt808，make 或者 make -j4 ，编译成功后会按照config.mk设置的路径生成可执行程序；make clean 清除编译.o
+
+另外，工程路径下jt808/third_party用来放置第三方库，可以是.so .a,.a要把源码也放进来
+所有第三方库均要使用arm-linux-androideabi-gcc进行编译，才能兼容设备运行环境
+
+三、运行
+运行时将需要的.so库拷到设备中的 /system/lib 中(libcares.so libcurl.so libstlport_shared.so)，将可执行程序和其配置文件 jtt808.xml 拷贝到/system/bin 中，jtt808.xml 就在工程顶层路径的jt808目录下。
+读写配置文件采用tinyxml2库进行读写，只需包含一个TRML_tinyxml2.h TRML_tinyxml2.cpp， 即可实现，读写方法在TRML_parse.cpp中已有使用，配置文件格式查看jtt808.xml写法
+还有一个终端参数配置文件terminal_param.xml，也要拷到/system/bin 中，当前使用boost库读写，将会改为tinyxml2库进行读写，文件格式按照jtt808.xml的tinyxml2格式编写。
