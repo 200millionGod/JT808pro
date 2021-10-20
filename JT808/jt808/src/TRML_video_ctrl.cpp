@@ -12,6 +12,7 @@
 #include "TRML_dbus.h"
 #include "TRML_video_ctrl.h"
 #include "../inc/debug_log.h"
+#include "../inc/TRML_third_party.h"
 
 #define SD_CARD_PATH      "/sdcard"
 #define SUPPORT_MAX_CHN   2
@@ -191,7 +192,9 @@ void video_req_stream_callback(void *data)
 	
 	Jt1078ReqStrem req_av;
 	memset(&req_av, 0, sizeof(Jt1078ReqStrem));
-
+	Jt1078CtrlStrem ctrl_av;
+	memset(&req_av, 0, sizeof(Jt1078CtrlStrem));
+	
 	req_av.addr_len          = server->server_addr_len;
 	memcpy(req_av.addr, server->server_addr, req_av.addr_len);
 	req_av.tcp_port          = server->tcp_port;
@@ -201,6 +204,8 @@ void video_req_stream_callback(void *data)
 	req_av.stream_type       = server->stream_type;
 	memset(req_av.phone_num, 0, 20);
 	memcpy(req_av.phone_num, g_mgr.terminal.phone_num, 15);
+	int reqOrCtrl = 1;	//reqOrCtrl:1:直播请求 2.直播控制
+	mutiStreamCatch(req_av, ctrl_av, reqOrCtrl);
 	//send to dbus
 //	jt1078_req_stream(&req_av);
 }
@@ -210,6 +215,8 @@ void video_stream_ctrl_callback(void *data)
 	DBG_LEVEL_6("[enter]");
 	VideoTransCtrl *trans_ctrl = (VideoTransCtrl *)data;
 
+	Jt1078ReqStrem req_av;
+	memset(&req_av, 0, sizeof(Jt1078ReqStrem));
 	Jt1078CtrlStrem ctrl_av;
 	memset(&ctrl_av, 0, sizeof(Jt1078CtrlStrem));
 
@@ -217,6 +224,9 @@ void video_stream_ctrl_callback(void *data)
 	ctrl_av.control_instrut   = trans_ctrl->control_instrut;
 	ctrl_av.close_av          = trans_ctrl->close_av;	
 	ctrl_av.switch_stream     = trans_ctrl->switch_stream;
+
+	int reqOrCtrl = 2;	//reqOrCtrl:1:直播请求 2.直播控制
+	mutiStreamCatch(req_av, ctrl_av, reqOrCtrl);
 	//send to dbus
 //	jt1078_ctrl_stream(&ctrl_av);
 }

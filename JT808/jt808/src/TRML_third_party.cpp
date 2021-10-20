@@ -38,6 +38,7 @@
 #include "../inc/cJSON.h"
 /*catch mp4 or jpg include end*/
 /*catch h264 stream include start*/
+#include "../inc/TRML_dbus.h"
 #include "../inc/videoStream/VideoClient.h"
 /*catch h264 stream include end*/
 
@@ -382,71 +383,266 @@ bool handle_snapshot_by_xj(int dev, unsigned short cmd, unsigned short period, u
 }
 /*snap shot end*/
 
-/*h264 stream catch start*/
+/*muti stream catch start*/
+#define START_CATCH_STREAM	1
+#define STOP_CATCH_STREAM	2
+#define FRONT				1
+#define REAR				2
 
-void h264StreamCatch(int )
+int reqOrCtrlFlag = STOP_CATCH_STREAM;
+int frontProcExitFlag = 1;
+int rearProcExitFlag = 1;
+
+vector <frame> frontH264StreamList;
+vector <frame> rearH264StreamList;
+vector <frame> AudioStreamList;
+
+static void result_callback1(const FramePacket* framePacket)
 {
-	printf("TestVideoClient***********************main init \n");
-	
-	streamList.clear();
-	pthread_t front_tid;
-
-	init(21020);
-	if (0 != pthread_create(&front_tid, NULL, front_proc, NULL))
+	static int frameIndex = 0;
+	if(frontProcExitFlag)
 	{
-		printf("Failed to create front_proc thread.errno:%u, reason:%s\n", errno, strerror(errno));
-		return - 1;
+		frameIndex = 0;
+	}
+	if(framePacket)
+	{
+		DBG_LEVEL_6("result_callback1 get h264 framePacket, framePacket->len = %d, framePacket->check = %d.", framePacket->len, framePacket->check);
+		unsigned char *frameBuf = new unsigned char[framePacket->len + 1];
+		struct frame singleFrame;
+		memset(&singleFrame, 0, sizeof(singleFrame));
+		memcpy(frameBuf, framePacket->data, framePacket->len);
+		singleFrame.len = framePacket->len;
+		DBG_LEVEL_6("singleFrame.len=%d\n", singleFrame.len);
+		singleFrame.data = new unsigned char[singleFrame.len + 1];
+/*		just for test
+		char tmp[6] = {
+			0x01, 0x02, 0x03, 0x04, 0x05, 0x06
+		};
+		memcpy(singleFrame.data, tmp, 6);
+*/
+		memcpy(singleFrame.data, framePacket->data, singleFrame.len);
+//		for(int i = 0; i < 5; i ++)
+//		{
+//			printf("%02x ", singleFrame.data[i]);
+//		}printf("\n");
+		frontH264StreamList.push_back(singleFrame);
+		memset(&singleFrame, 0, sizeof(singleFrame));
+		free(singleFrame.data);
+		free(frameBuf);
+		DBG_LEVEL_6("In result_callback1 frameIndex = %d", frameIndex ++);
+		for(int index = 0; index < framePacket->len; index ++)
+		{
+			printf("%02x ", framePacket->data[index]);
+		}
+		printf("-----------------------------------------------------------\n");
 	}else
 	{
-		printf("success to create front_proc thread\n");
+		DBG_LEVEL_6("result_callback1 can't get h264 framePacket...");
 	}
-#if 0
-		pthread_t rear_tid; 	
-		if (0 != pthread_create(&rear_tid, NULL, rear_proc, NULL))
+}
+
+static void result_callback2(const FramePacket* framePacket)
+{
+	static int frameIndex = 0;
+	if(rearProcExitFlag)
+	{
+		frameIndex = 0;
+	}
+	if(framePacket)
+	{
+		DBG_LEVEL_6("result_callback2 get h264 framePacket, framePacket->len = %d, framePacket->check = %d.", framePacket->len, framePacket->check);
+		unsigned char *frameBuf = new unsigned char[framePacket->len + 1];
+		struct frame singleFrame;
+		memset(&singleFrame, 0, sizeof(singleFrame));
+		memcpy(frameBuf, framePacket->data, framePacket->len);
+		singleFrame.len = framePacket->len;
+		DBG_LEVEL_6("singleFrame.len=%d\n", singleFrame.len);
+		singleFrame.data = new unsigned char[singleFrame.len + 1];
+/*		just for test
+		char tmp[6] = {
+			0x01, 0x02, 0x03, 0x04, 0x05, 0x06
+		};
+		memcpy(singleFrame.data, tmp, 6);
+*/
+		memcpy(singleFrame.data, framePacket->data, singleFrame.len);
+//		for(int i = 0; i < 5; i ++)
+//		{
+//			printf("%02x ", singleFrame.data[i]);
+//		}printf("\n");
+		rearH264StreamList.push_back(singleFrame);
+		memset(&singleFrame, 0, sizeof(singleFrame));
+		free(singleFrame.data);
+		free(frameBuf);
+		DBG_LEVEL_6("In result_callback2 frameIndex = %d", frameIndex ++);
+		for(int index = 0; index < framePacket->len; index ++)
 		{
-			printf("Failed to create rear_proc thread.errno:%u, reason:%s\n", errno, strerror(errno));
+			printf("%02x ", framePacket->data[index]);
+		}
+		printf("-----------------------------------------------------------\n");
+	}else
+	{
+		DBG_LEVEL_6("result_callback2 can't get h264 framePacket...");
+	}
+}
+
+void audio_stream_callback(const AudioPacket* framePacket)
+{
+	static int frameIndex = 0;
+	if(rearProcExitFlag)
+	{
+		frameIndex = 0;
+	}
+	if(framePacket)
+	{
+		DBG_LEVEL_6("audio_stream_callback get aac framePacket, framePacket->len = %d, framePacket->check = %d.", framePacket->len, framePacket->check);
+		unsigned char *frameBuf = new unsigned char[framePacket->len + 1];
+		struct frame singleFrame;
+		memset(&singleFrame, 0, sizeof(singleFrame));
+		memcpy(frameBuf, framePacket->data, framePacket->len);
+		singleFrame.len = framePacket->len;
+		DBG_LEVEL_6("singleFrame.len=%d\n", singleFrame.len);
+		singleFrame.data = new unsigned char[singleFrame.len + 1];
+/*		just for test
+		char tmp[6] = {
+			0x01, 0x02, 0x03, 0x04, 0x05, 0x06
+		};
+		memcpy(singleFrame.data, tmp, 6);
+*/
+		memcpy(singleFrame.data, framePacket->data, singleFrame.len);
+//		for(int i = 0; i < 5; i ++)
+//		{
+//			printf("%02x ", singleFrame.data[i]);
+//		}printf("\n");
+		rearH264StreamList.push_back(singleFrame);
+		memset(&singleFrame, 0, sizeof(singleFrame));
+		free(singleFrame.data);
+		free(frameBuf);
+		DBG_LEVEL_6("In audio_stream_callback frameIndex = %d", frameIndex ++);
+		for(int index = 0; index < framePacket->len; index ++)
+		{
+			printf("%02x ", framePacket->data[index]);
+		}
+		printf("-----------------------------------------------------------\n");
+	}else
+	{
+		DBG_LEVEL_6("result_callback2 can't get aac framePacket...");
+	}
+
+}
+
+void * front_proc(void * arg)
+{
+    int time = 0;
+	frontProcExitFlag = 0;
+	videoUploadStart("127.0.0.1", 21010,1, result_callback1);
+    while (time < 180)
+	{
+		if(reqOrCtrlFlag == STOP_CATCH_STREAM)
+		{
+			break;
+		}
+		time += 1;
+		sleep(1);
+		printf("Catching h.264 stream of front camera, time lasts %d seconds...\n", time);
+    }
+	videoUploadStop();
+	frontProcExitFlag = 1;
+	pthread_exit(0);
+
+	return NULL;
+}
+
+void * rear_proc(void * arg)
+{
+    int time = 0;
+	rearProcExitFlag = 0;
+	videoUploadStartEx("127.0.0.1", 21010,1,1, result_callback2);
+    while (time < 180)
+	{
+		if(reqOrCtrlFlag == STOP_CATCH_STREAM)
+		{
+			break;
+		}
+		time += 1;
+		sleep(1);
+		printf("Catching h.264 stream of rear camera, time lasts %d seconds...\n", time);
+	}
+	videoUploadStopEx(1);
+	rearProcExitFlag = 1;
+	pthread_exit(0);
+
+	return NULL;
+}
+
+void * audio_proc(void * arg)
+{
+	int time = 0;
+
+	audioUploadStart("127.0.0.1", 31010, audio_stream_callback);
+	while(time < 180)
+	{
+		if(reqOrCtrlFlag == STOP_CATCH_STREAM)
+		{
+			break;
+		}
+		time += 1;
+		sleep(1);
+		printf("Catching AAC stream of rear camera, time lasts %d seconds...\n", time);
+	}
+	audioUploadStop();
+	pthread_exit(0);
+
+	return NULL;
+}
+
+
+int mutiStreamCatch(Jt1078ReqStrem& req_av, Jt1078CtrlStrem& ctrl_av, int reqOrCtrl)
+{
+	init(21020);
+	if(reqOrCtrl == START_CATCH_STREAM)
+	{
+		reqOrCtrlFlag = reqOrCtrl;
+		if(req_av.chn == FRONT)
+		{
+			pthread_t front_tid;
+			if (0 != pthread_create(&front_tid, NULL, front_proc, NULL))
+			{
+				printf("Failed to create front_proc thread.errno:%u, reason:%s\n", errno, strerror(errno));
+				return - 1;
+			}else
+			{
+				printf("success to create front_proc thread\n");
+			}
+			pthread_join(front_tid, NULL);
+		}else if(req_av.chn == REAR)
+		{
+			pthread_t rear_tid; 	
+			if (0 != pthread_create(&rear_tid, NULL, rear_proc, NULL))
+			{
+				printf("Failed to create rear_proc thread.errno:%u, reason:%s\n", errno, strerror(errno));
+				return - 1;
+			}else
+			{
+				printf("success to create rear_proc thread\n"); 		
+			}
+			pthread_join(rear_tid, NULL);	
+		}
+		
+		pthread_t audio_tid;
+		if(0 != pthread_create(&audio_tid, NULL, audio_proc, NULL))
+		{
+			printf("Failed to create audio_proc thread.errno:%u, reason:%s\n", errno, strerror(errno));
 			return - 1;
 		}else
 		{
-			printf("success to create rear_proc thread\n"); 		
+			printf("success to create audio_proc thread\n");			
 		}
-		pthread_join(rear_tid, NULL);	
-#endif
-		pthread_join(front_tid, NULL);
-#if 1
-		int size = (int)streamList.size();
-		printf("size of streamList = %d.\n", size);
-		if(size)
-		{
-			for(int index = 0; index < size; index ++)
-			{
-				for(int i = 0; i < streamList[index].len; i ++)
-				{
-					printf("%02x ", streamList[index].data[i]);
-				}printf("\n");
-				printf("------------------------------------------\n");
-			}
-#endif
-#if 1
-			if(access(H264_FILE_PATH, F_OK ) == 0)
-			{
-				FILE *fp = fopen(H264_FILE_PATH, "w");
-				for(int index = 0; index < size; index ++)
-				{
-					if(fp)
-					{
-	//					printf("going to write:");
-	//					for(int i = 0; i < streamList[0].len; i ++)
-	//					{
-	//						printf("%02x ", streamList[0].data[i]);
-	//					}printf("\n");
-						fwrite(&streamList[index].data, streamList[index].len, 1, fp);
-					}
-				}
-				fclose(fp);
-			}
-#endif
-		}
+		pthread_join(audio_tid, NULL);
+	}else if(reqOrCtrl == STOP_CATCH_STREAM)
+	{
+		reqOrCtrlFlag = reqOrCtrl;	//设置标志位，停止抓流，退出线程
+	}
 
+	return 0;
 }
-/*h264 stream catch start*/
+/*muti stream catch end*/

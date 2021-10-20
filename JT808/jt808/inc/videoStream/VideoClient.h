@@ -1,12 +1,9 @@
-#ifndef __VIDEOCLIENT__
-#define __VIDEOCLIENT__
-
 #define _UTILS_H
-//#ifdef LOG_TAG
-//#undef LOG_TAG
-//#endif
+#ifdef LOG_TAG
+#undef LOG_TAG
+#endif
 
-//#define LOG_TAG 				"VideoClient.h"
+#define LOG_TAG 				"VideoClient.h"
 
 
 
@@ -21,9 +18,19 @@ typedef struct
 	unsigned char data[];
 } FramePacket;
 
-
+typedef struct
+{
+	unsigned int check;		//0xabcd1234
+	unsigned short seq;		//帧序号
+	unsigned char nlist;	    //发送缓冲数量
+	unsigned char bkey;
+	long long tick;		//时间戳
+	int len;				// > 0  data长度     0 心跳   -1 连接数满 
+	unsigned char data[];
+} AudioPacket;
 
 typedef void (*result_callback)(const FramePacket* framePacket);
+typedef void (*audio_callback)(const AudioPacket* audioPacket);
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -62,11 +69,13 @@ void videoUploadStart(char *ip,int locPort,int imainstream, result_callback call
 void videoUploadStop();
 
 
-
+//音频
+int audioUploadStart(char *ip,int locPort,audio_callback callback);
+void audioUploadStop();
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+
